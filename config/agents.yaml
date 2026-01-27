@@ -1,0 +1,9 @@
+agents:
+  - id: "support-agent"
+    name: "Customer Support"
+    voice: "en-US-Neural2-F"
+    prompt: "You are a helpful customer support agent for Omnicore AI."
+  - id: "sales-agent"
+    name: "Sales Representative"
+    voice: "en-US-Neural2-D"
+    prompt: "You are a sales representative for Omnicore AI."
