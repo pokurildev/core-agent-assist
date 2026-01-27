@@ -1,8 +1,10 @@
 from app.main import app
 from app.core.config_loader import get_config
+import pytest
 import asyncio
 from httpx import AsyncClient, ASGITransport
 
+@pytest.mark.asyncio
 async def test_config_reload():
     print("--- Testing Config Reload Endpoint ---")
     
