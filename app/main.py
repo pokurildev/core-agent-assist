@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.core.config import settings
 from app.core.logger import logger
+from app.core.config_loader import get_config
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -27,6 +28,15 @@ app.add_middleware(
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
+
+@app.post("/config/reload")
+async def reload_config():
+    """
+    Очищает кэш lru_cache для обновления настроек без перезапуска сервера.
+    """
+    get_config.cache_clear()
+    logger.info("Configuration cache cleared successfully.")
+    return {"status": "success", "message": "Configuration reloaded"}
 
 @app.post("/inbound")
 async def vapi_inbound(request: Request):

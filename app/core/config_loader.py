@@ -6,6 +6,9 @@ from functools import lru_cache
 from pydantic import BaseModel, Field
 from app.core.logger import logger
 
+# BASE_DIR указывает на корень проекта (на три уровня выше этого файла: app/core/config_loader.py)
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
 class VoiceSettings(BaseModel):
     provider: str
     voice_id: str
@@ -19,29 +22,34 @@ class AppSettings(BaseModel):
     tools_enabled: List[str] = Field(default_factory=list)
 
 def _read_knowledge_base(file_path: str) -> str:
-    """Reads the knowledge base file if it exists."""
+    """Безопасно читает файл базы знаний relative to BASE_DIR."""
     path = Path(file_path)
-    if not path.exists():
-        logger.warning(f"Knowledge base file not found at {file_path}")
-        return ""
-    
+    if not path.is_absolute():
+        path = BASE_DIR / path
+        
     try:
         content = path.read_text(encoding="utf-8")
-        logger.info(f"Loaded knowledge base from {file_path}")
+        logger.info(f"Loaded knowledge base from {path}")
         return content
+    except FileNotFoundError:
+        logger.error(f"Knowledge base file not found at {path}")
+        return ""
     except Exception as e:
-        logger.error(f"Error reading knowledge base file: {e}")
+        logger.error(f"Unexpected error reading knowledge base: {e}")
         return ""
 
 @lru_cache()
 def get_config(config_path: str = "config/settings.yaml") -> AppSettings:
     """
     Loads, validates, and enhances the configuration from a YAML file.
-    Implements Context Injection for the knowledge base.
+    All paths are resolved relative to BASE_DIR.
     """
     path = Path(config_path)
+    if not path.is_absolute():
+        path = BASE_DIR / path
+
     if not path.exists():
-        raise FileNotFoundError(f"Config file not found: {config_path}")
+        raise FileNotFoundError(f"Config file not found: {path}")
 
     with open(path, "r", encoding="utf-8") as f:
         config_data = yaml.safe_load(f)
