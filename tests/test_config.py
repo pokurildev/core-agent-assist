@@ -2,6 +2,7 @@ import pytest
 import yaml
 from unittest.mock import patch, mock_open, MagicMock
 from pathlib import Path
+from pydantic import ValidationError
 from app.core.config_loader import get_config, AppSettings
 
 @pytest.fixture(autouse=True)
@@ -84,3 +85,38 @@ def test_config_file_not_found():
     with patch("pathlib.Path.exists", return_value=False):
         with pytest.raises(FileNotFoundError):
             get_config("missing_settings.yaml")
+
+def test_config_invalid_type():
+    """Проверяет валидацию типов (строка вместо числа в stability)."""
+    yaml_content = {
+        "system_prompt": "Base prompt",
+        "voice_settings": {
+            "provider": "elevenlabs",
+            "voice_id": "adam",
+            "stability": "NOT_A_NUMBER"
+        }
+    }
+    yaml_str = yaml.dump(yaml_content)
+    
+    with patch("pathlib.Path.exists", return_value=True), \
+         patch("builtins.open", mock_open(read_data=yaml_str)):
+        
+        with pytest.raises(ValidationError):
+            get_config()
+
+def test_config_missing_field():
+    """Проверяет реакцию на отсутствие обязательного поля."""
+    yaml_content = {
+        "system_prompt": "Base prompt",
+        "voice_settings": {
+            "provider": "elevenlabs"
+            # voice_id отсутствует
+        }
+    }
+    yaml_str = yaml.dump(yaml_content)
+    
+    with patch("pathlib.Path.exists", return_value=True), \
+         patch("builtins.open", mock_open(read_data=yaml_str)):
+        
+        with pytest.raises(ValidationError):
+            get_config()
