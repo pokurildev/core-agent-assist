@@ -120,3 +120,21 @@ def test_config_missing_field():
         
         with pytest.raises(ValidationError):
             get_config()
+
+def test_config_out_of_range():
+    """Проверяет валидацию границ значений (stability > 1.0)."""
+    yaml_content = {
+        "system_prompt": "Base prompt",
+        "voice_settings": {
+            "provider": "elevenlabs",
+            "voice_id": "adam",
+            "stability": 1.5  # Выход за границу [0, 1]
+        }
+    }
+    yaml_str = yaml.dump(yaml_content)
+    
+    with patch("pathlib.Path.exists", return_value=True), \
+         patch("builtins.open", mock_open(read_data=yaml_str)):
+        
+        with pytest.raises(ValidationError):
+            get_config()
