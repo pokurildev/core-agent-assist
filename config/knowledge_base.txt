@@ -1,0 +1,5 @@
+Omnicore AI Knowledge Base:
+- We provides voice AI solutions for business.
+- Support is available 24/7 via webhooks.
+- VAPI.ai integration is our core strength.
+- Our mission is to humanize AI interactions.

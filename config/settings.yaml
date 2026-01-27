@@ -1,0 +1,10 @@
+system_prompt: "You are a helpful AI voice assistant."
+knowledge_base_file: "config/knowledge_base.txt"
+voice_settings:
+  provider: "11labs"
+  voice_id: "adam"
+  stability: 0.5
+  similarity_boost: 0.75
+tools_enabled:
+  - "web_search"
+  - "calendar_sync"
