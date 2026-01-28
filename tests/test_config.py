@@ -33,8 +33,12 @@ def test_get_config_success():
         assert config.voice_settings.provider == "elevenlabs"
         assert "web_search" in config.tools_enabled
 
-def test_context_injection_success():
-    """Проверяет, что база знаний успешно 'подшивается' в промпт."""
+def test_context_injection_removed_from_loader():
+    """
+    Проверяет, что база знаний НЕ подшивается в промпт при загрузке.
+    Это нужно для того, чтобы при сохранении конфига через админку
+    мы не перезаписывали файл огромным куском текста.
+    """
     yaml_content = {
         "system_prompt": "Base prompt",
         "knowledge_base_file": "config/knowledge_base.txt",
@@ -45,15 +49,17 @@ def test_context_injection_success():
     }
     yaml_str = yaml.dump(yaml_content)
     kb_content = "This is some expert knowledge."
-    
+
+    # Мокаем (подменяем) файловую систему
     with patch("pathlib.Path.exists", return_value=True), \
          patch("builtins.open", mock_open(read_data=yaml_str)), \
          patch("pathlib.Path.read_text", return_value=kb_content):
-        
+
         config = get_config()
+        
+        # ТЕПЕРЬ МЫ ЖДЕМ, ЧТО БАЗЫ ЗНАНИЙ ТУТ НЕТ!
         assert "Base prompt" in config.system_prompt
-        assert kb_content in config.system_prompt
-        assert "ADDITIONAL KNOWLEDGE BASE CONTEXT" in config.system_prompt
+        assert kb_content not in config.system_prompt
 
 def test_knowledge_base_not_found():
     """Проверяет обработку отсутствующего файла базы знаний."""
