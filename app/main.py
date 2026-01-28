@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.core.config import settings
+from app.handlers.inbound import router as inbound_router
 from app.core.logger import logger
 
 @asynccontextmanager
@@ -24,18 +25,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(inbound_router)
+
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
-
-@app.post("/inbound")
-async def vapi_inbound(request: Request):
-    """
-    Dummy endpoint for VAPI webhooks
-    """
-    payload = await request.json()
-    logger.info(f"Received VAPI webhook: {payload}")
-    return {"status": "received", "vapi_status": "success"}
 
 if __name__ == "__main__":
     import uvicorn
