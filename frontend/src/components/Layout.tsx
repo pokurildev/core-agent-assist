@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Settings, ListStart, LogOut } from 'lucide-react';
+import { Settings, ListStart, LogOut, ShoppingCart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const Layout: React.FC = () => {
@@ -16,6 +16,7 @@ const Layout: React.FC = () => {
 
     const navItems = [
         { name: 'Settings', icon: Settings, href: '/' },
+        { name: 'Orders', icon: ShoppingCart, href: '/orders' },
         { name: 'Logs', icon: ListStart, href: '/logs' },
     ];
 
