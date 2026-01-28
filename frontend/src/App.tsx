@@ -3,6 +3,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import Layout from '@/components/Layout';
 import Settings from '@/pages/Settings';
+import Orders from '@/pages/Orders';
 import Logs from '@/pages/Logs';
 import Login from '@/pages/Login';
 import { Toaster } from '@/components/ui/sonner';
@@ -22,6 +23,7 @@ function App() {
             }
           >
             <Route index element={<Settings />} />
+            <Route path="orders" element={<Orders />} />
             <Route path="logs" element={<Logs />} />
           </Route>
         </Routes>

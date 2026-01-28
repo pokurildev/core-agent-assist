@@ -1,5 +1,13 @@
 import api from '@/lib/api';
 
+export interface Order {
+    id: string;
+    customer_name: string;
+    phone: string;
+    status: string;
+    created_at: string;
+}
+
 export interface BotConfig {
     system_prompt: string;
     voice_settings: {
@@ -24,6 +32,11 @@ export const adminService = {
 
     fetchLogs: async (): Promise<any[]> => {
         const response = await api.get('/logs');
+        return response.data;
+    },
+
+    fetchOrders: async (): Promise<Order[]> => {
+        const response = await api.get('/orders');
         return response.data;
     },
 };

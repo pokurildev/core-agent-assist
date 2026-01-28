@@ -89,14 +89,49 @@ async def fetch_logs():
             for line in last_lines:
                 try:
                     entry = json.loads(line.strip())
-                    if isinstance(entry, dict) and "message" in entry:
+                    # Loguru с serialize=True кладет данные в "record"
+                    if isinstance(entry, dict) and "record" in entry:
+                        record = entry["record"]
+                        logs.append({
+                            "timestamp": record["time"].get("repr"),
+                            "level": record["level"].get("name"),
+                            "message": record["message"],
+                            "module": record["name"],
+                            "function": record["function"],
+                            "line": record["line"]
+                        })
+                    elif isinstance(entry, dict) and "message" in entry:
+                        # Поддержка старого плоского формата
                         logs.append(entry)
-                except:
+                except Exception as e:
                     continue
             return logs
     except Exception as e:
         logger.error(f"Error reading logs: {e}")
         return {"error": str(e)}
+
+@app.get("/v1/orders")
+async def fetch_orders():
+    import random
+    from datetime import datetime, timedelta
+    from app.schemas.orders import Order
+    
+    names = ["Алексей Петров", "Мария Сидорова", "Иван Иванов", "Елена Кузнецова", "Дмитрий Волков", "Татьяна Соколова", "Сергей Морозов"]
+    statuses = ["new", "completed", "failed"]
+    
+    mock_orders = []
+    for i in range(10):
+        mock_orders.append(Order(
+            id=f"ord-{1000 + i}",
+            customer_name=random.choice(names),
+            phone=f"+7 900 {random.randint(100, 999)}-{random.randint(10, 99)}-{random.randint(10, 99)}",
+            status=random.choice(statuses),
+            created_at=datetime.now() - timedelta(hours=random.randint(1, 48))
+        ))
+    
+    # Сортируем: новые сверху
+    mock_orders.sort(key=lambda x: x.created_at, reverse=True)
+    return mock_orders
 
 from app.handlers.inbound import vapi_inbound_handler
 
