@@ -1,0 +1,6 @@
+system_prompt: "You are a helpful AI voice assistant."
+knowledge_base_file: "config/NON_EXISTENT_FILE.txt"
+voice_settings:
+  provider: "11labs"
+  voice_id: "adam"
+tools_enabled: []
