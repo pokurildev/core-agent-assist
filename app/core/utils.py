@@ -3,14 +3,25 @@ from typing import Any, Dict, Type
 from pydantic import create_model, Field
 
 def to_snake_case(name: str) -> str:
-    """Конвертирует строку в snake_case, удаляя лишние пробелы и символы."""
-    # Заменяем пробелы и дефисы на подчеркивания
-    name = re.sub(r'[\s-]+', '_', name)
-    # Вставляем подчеркивание перед заглавными буквами (CamelCase -> snake_case)
+    """
+    Конвертирует строку в snake_case, удаляя лишние пробелы и символы.
+    Гарантирует, что результат является валидным идентификатором Python.
+    """
+    # 1. Заменяем любые символы, кроме букв, цифр и подчеркиваний, на подчеркивания
+    name = re.sub(r'[^a-zA-Z0-9_]', '_', name)
+    
+    # 2. Вставляем подчеркивание перед заглавными буквами (CamelCase -> snake_case)
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
     s2 = re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
-    # Заменяем множественные подчеркивания на одно
-    return re.sub(r'_+', '_', s2).strip('_')
+    
+    # 3. Заменяем множественные подчеркивания на одно
+    result = re.sub(r'_+', '_', s2).strip('_')
+    
+    # 4. Если строка начинается с цифры, добавляем подчеркивание в начало
+    if result and result[0].isdigit():
+        result = f'_{result}'
+        
+    return result or "field"
 
 def create_dynamic_model(model_name: str, fields: Dict[str, str]) -> Type:
     """

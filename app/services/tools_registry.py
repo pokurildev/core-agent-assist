@@ -43,7 +43,7 @@ def generate_vapi_tool_schema() -> Dict[str, Any]:
     Генерирует схему на основе полей из текущей конфигурации.
     """
     settings = get_config()
-    fields = settings.data_collection_fields
+    fields = settings.voice_settings.dynamic_fields
     
     if not fields:
         return {}

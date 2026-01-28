@@ -38,33 +38,11 @@ async def reload_config():
     logger.info("Configuration cache cleared successfully.")
     return {"status": "success", "message": "Configuration reloaded"}
 
-from app.services.tools_registry import generate_vapi_tool_schema
+from app.handlers.inbound import vapi_inbound_handler
 
 @app.post("/inbound")
 async def vapi_inbound(request: Request):
-    """
-    Inbound handler for VAPI webhooks. 
-    Injects dynamic tools based on configuration.
-    """
-    payload = await request.json()
-    logger.info(f"Received VAPI webhook: {payload}")
-    
-    # Генерация динамической схемы инструментов
-    tool_schema = generate_vapi_tool_schema()
-    
-    # Если VAPI запрашивает конфигурацию ассистента
-    if payload.get("message", {}).get("type") == "assistant-request":
-        return {
-            "assistant": {
-                "model": {
-                    "provider": "openai",
-                    "model": "gpt-4-turbo",
-                    "tools": [tool_schema] if tool_schema else []
-                }
-            }
-        }
-
-    return {"status": "received", "vapi_status": "success"}
+    return await vapi_inbound_handler(request)
 
 if __name__ == "__main__":
     import uvicorn

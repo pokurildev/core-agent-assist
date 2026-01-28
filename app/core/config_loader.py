@@ -14,13 +14,13 @@ class VoiceSettings(BaseModel):
     voice_id: str = Field(..., min_length=1)
     stability: float = Field(0.5, ge=0.0, le=1.0)
     similarity_boost: float = Field(0.75, ge=0.0, le=1.0)
+    dynamic_fields: dict[str, str] = Field(default_factory=dict)
 
 class AppSettings(BaseModel):
     system_prompt: str
     knowledge_base_file: Optional[str] = None
     voice_settings: VoiceSettings
     tools_enabled: List[str] = Field(default_factory=list)
-    data_collection_fields: dict[str, str] = Field(default_factory=dict)
 
 def _read_knowledge_base(file_path: str) -> str:
     """Безопасно читает файл базы знаний relative to BASE_DIR."""
