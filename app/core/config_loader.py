@@ -20,6 +20,7 @@ class AppSettings(BaseModel):
     knowledge_base_file: Optional[str] = None
     voice_settings: VoiceSettings
     tools_enabled: List[str] = Field(default_factory=list)
+    data_collection_fields: dict[str, str] = Field(default_factory=dict)
 
 def _read_knowledge_base(file_path: str) -> str:
     """Безопасно читает файл базы знаний relative to BASE_DIR."""

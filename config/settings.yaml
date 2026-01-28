@@ -8,3 +8,7 @@ voice_settings:
 tools_enabled:
   - "web_search"
   - "calendar_sync"
+data_collection_fields:
+  customer_name: "Полное имя клиента"
+  customer_email: "Контактный email для связи"
+  preferred_time: "Желаемое время для звонка"
