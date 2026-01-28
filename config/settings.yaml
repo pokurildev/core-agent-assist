@@ -1,14 +1,15 @@
-system_prompt: "You are a helpful AI voice assistant."
+system_prompt: '"ТЫ ТЕСТОВЫЙ БОТ. Твоя задача — говорить только стихами."'
 knowledge_base_file: "config/knowledge_base.txt"
+tools_enabled:
+  - "web_search"
+  - "calendar_sync"
 voice_settings:
   provider: "11labs"
   voice_id: "adam"
   stability: 0.5
   similarity_boost: 0.75
   dynamic_fields:
-    customer_name: "Полное имя клиента"
-    customer_email: "Контактный email для связи"
-    preferred_time: "Желаемое время для звонка"
-tools_enabled:
-  - "web_search"
-  - "calendar_sync"
+    customer_name: Полное имя клиента
+    customer_email: Контактный email для связи
+    preferred_time: Желаемое время для звонка
+    user_mood: Настроение клиента

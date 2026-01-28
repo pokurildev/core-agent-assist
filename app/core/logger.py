@@ -16,10 +16,20 @@ def json_serializer(record):
 
 def setup_logging():
     logger.remove()
+    
+    # Console handler (JSON)
     logger.add(
         sys.stdout,
         format="{message}",
         serialize=True,
+        level="INFO"
+    )
+    
+    # File handler (Custom JSON)
+    logger.add(
+        "logs/app.json",
+        rotation="10 MB",
+        format=json_serializer,
         level="INFO"
     )
 

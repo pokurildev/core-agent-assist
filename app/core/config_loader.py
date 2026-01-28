@@ -59,12 +59,13 @@ def get_config(config_path: str = "config/settings.yaml") -> AppSettings:
     # Validate with Pydantic
     settings = AppSettings(**config_data)
 
-    # Context Injection
+    # Context Injection (Logic preserved but not polluting the main settings object)
+    # The actual injection should happen when the prompt is sent to the LLM.
     if settings.knowledge_base_file:
         kb_content = _read_knowledge_base(settings.knowledge_base_file)
         if kb_content:
-            separator = "\n\n=== ADDITIONAL KNOWLEDGE BASE CONTEXT ===\n"
-            settings.system_prompt += f"{separator}{kb_content}"
-            logger.info("Knowledge base injected into system prompt.")
+            logger.info("Knowledge base content is ready for injection.")
+            # For now, we don't modify settings.system_prompt here to avoid 
+            # saving bloated prompts back to config files.
 
     return settings
