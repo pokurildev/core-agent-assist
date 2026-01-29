@@ -4,8 +4,9 @@ export interface Order {
     id: string;
     customer_name: string;
     phone: string;
-    status: string;
-    created_at: string;
+    status?: string;
+    created_at?: string;
+    notes?: string;
 }
 
 export interface BotConfig {
@@ -37,6 +38,11 @@ export const adminService = {
 
     fetchOrders: async (): Promise<Order[]> => {
         const response = await api.get('/orders');
+        return response.data;
+    },
+
+    fetchLeads: async (): Promise<any[]> => {
+        const response = await api.get('/leads');
         return response.data;
     },
 };

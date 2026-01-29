@@ -2,11 +2,12 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.core.config import settings
-from app.core.logger import logger
+from app.core.logger import logger, configure_logging
 from app.core.config_loader import get_config
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    configure_logging()
     logger.info("Starting Omnicore AI Backend...")
     yield
     logger.info("Shutting down Omnicore AI Backend...")
@@ -132,6 +133,17 @@ async def fetch_orders():
     # Сортируем: новые сверху
     mock_orders.sort(key=lambda x: x.created_at, reverse=True)
     return mock_orders
+
+@app.get("/v1/leads")
+async def get_leads():
+    from app.adapters.google_sheets import sheets_manager
+    
+    if not settings.SPREADSHEET_ID:
+        return []
+        
+    range_name = f"{settings.GOOGLE_SHEET_NAME}!A:C"
+    leads = await sheets_manager.read_leads(settings.SPREADSHEET_ID, range_name)
+    return leads
 
 from app.handlers.inbound import vapi_inbound_handler
 from app.core.security import verify_vapi_secret

@@ -5,18 +5,23 @@ WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    POETRY_VERSION=1.8.2
+    POETRY_VERSION=1.8.2 \
+    POETRY_VIRTUALENVS_IN_PROJECT=1 \
+    POETRY_NO_INTERACTION=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install "poetry==$POETRY_VERSION"
+# Install Poetry
+RUN curl -sSL https://install.python-poetry.org | python3 -
+ENV PATH="/root/.local/bin:$PATH"
 
 COPY pyproject.toml poetry.lock ./
-RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
+# Install dependencies into .venv
+RUN poetry install --without dev --no-root
 
 # Stage 2: Final
 FROM python:3.11-slim
@@ -24,16 +29,18 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Create non-root user
-RUN groupadd -r appuser && useradd -r -g appuser appuser
+RUN groupadd -r appuser && useradd -r -g appuser -u 1000 appuser
 
-# Install dependencies from wheels
-COPY --from=builder /app/wheels /wheels
-COPY --from=builder /app/requirements.txt .
-RUN pip install --no-cache-dir /wheels/*
+# Copy virtualenv
+COPY --from=builder /app/.venv /app/.venv
+
+# Update PATH to use the virtualenv
+ENV PATH="/app/.venv/bin:$PATH" \
+    PYTHONPATH="/app"
 
 # Copy application files
-COPY app/ ./app/
-COPY config/ ./config/
+COPY --chown=appuser:appuser app/ ./app/
+COPY --chown=appuser:appuser config/ ./config/
 
 # Ensure logs directory exists and is writable
 RUN mkdir logs && chown appuser:appuser logs

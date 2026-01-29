@@ -35,13 +35,13 @@ def telegram_sink(message):
     def send_in_thread():
         try:
             # Import here to avoid circular dependency
-            from app.adapters.telegram import send_telegram_message
+            from app.adapters.telegram import send_message
             
             # Create new event loop for this thread
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             try:
-                loop.run_until_complete(send_telegram_message(alert_text))
+                loop.run_until_complete(send_message(alert_text))
             finally:
                 loop.close()
         except Exception as e:
@@ -53,25 +53,39 @@ def telegram_sink(message):
     thread.start()
 
 
-# Удаляем старые кастомные форматы, если они ломают запуск
-logger.remove()
+from app.core.config import settings
 
-# 1. Консольный вывод (Красивый, для разработчика)
-logger.add(
-    sys.stderr, 
-    format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | {message}"
-)
+def configure_logging():
+    """
+    Configures logging based on application environment.
+    """
+    # Remove default handler
+    logger.remove()
+    
+    # 1. Console Output
+    if settings.APP_ENV == "prod":
+        # JSON format for production (better for CloudWatch / ELK)
+        logger.add(sys.stderr, serialize=True, level="INFO")
+    else:
+        # Pretty colored format for development
+        logger.add(
+            sys.stderr, 
+            format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | {message}",
+            level="DEBUG"
+        )
 
-# 2. Файловый вывод (Самый надежный способ для JSON)
-logger.add(
-    "logs/app.json", 
-    rotation="10 MB", 
-    serialize=True
-)
+    # 2. File Output (Always JSON for machine readability)
+    logger.add(
+        "logs/app.json", 
+        rotation="10 MB", 
+        serialize=True,
+        level="INFO"
+    )
 
-# 3. Telegram sink для ERROR и CRITICAL логов
-logger.add(
-    telegram_sink,
-    level="ERROR",
-    format="{message}"
-)
+    # 3. Telegram Alerting (ERROR+)
+    if settings.TELEGRAM_BOT_TOKEN and settings.ADMIN_CHAT_ID:
+        logger.add(
+            telegram_sink,
+            level="ERROR",
+            format="{message}"
+        )

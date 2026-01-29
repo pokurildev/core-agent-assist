@@ -24,10 +24,11 @@ const Orders: React.FC = () => {
         if (!quiet) setLoading(true);
         setIsRefreshing(true);
         try {
-            const data = await adminService.fetchOrders();
+            // Updated to fetch real leads
+            const data = await adminService.fetchLeads();
             setOrders(data);
         } catch (error) {
-            toast.error('Failed to fetch orders');
+            toast.error('Failed to fetch leads');
             console.error(error);
         } finally {
             setLoading(false);
@@ -39,26 +40,8 @@ const Orders: React.FC = () => {
         loadOrders();
     }, [loadOrders]);
 
-    const getStatusBadge = (status: string) => {
-        switch (status.toLowerCase()) {
-            case 'completed':
-                return <Badge className="bg-green-500 hover:bg-green-600 text-white">Completed</Badge>;
-            case 'new':
-                return <Badge className="bg-yellow-500 hover:bg-yellow-600 text-white">New</Badge>;
-            case 'failed':
-                return <Badge variant="destructive">Failed</Badge>;
-            default:
-                return <Badge variant="outline">{status}</Badge>;
-        }
-    };
-
-    const formatDate = (dateStr: string) => {
-        try {
-            return new Date(dateStr).toLocaleString();
-        } catch {
-            return dateStr;
-        }
-    };
+    // Helpers not needed for basic leads or need update
+    // status and date are not in basic lead sheet logic yet
 
     return (
         <div className="space-y-6">
@@ -66,8 +49,8 @@ const Orders: React.FC = () => {
                 <div className="flex items-center gap-3">
                     <ShoppingCart className="h-8 w-8 text-primary" />
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Orders</h1>
-                        <p className="text-muted-foreground">Manage and track orders generated via voice calls.</p>
+                        <h1 className="text-3xl font-bold tracking-tight">Leads & Orders</h1>
+                        <p className="text-muted-foreground">Real-time leads from Google Sheets.</p>
                     </div>
                 </div>
                 <Button
@@ -83,9 +66,9 @@ const Orders: React.FC = () => {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Recent Orders</CardTitle>
+                    <CardTitle>Recent Leads</CardTitle>
                     <CardDescription>
-                        A list of the most recent orders from your voice bot.
+                        Data sourced from {`Google Sheets (Leads!A:C)`}.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -93,37 +76,33 @@ const Orders: React.FC = () => {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="w-[120px]">Order ID</TableHead>
                                     <TableHead>Customer</TableHead>
                                     <TableHead>Phone</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead className="text-right">Created At</TableHead>
+                                    <TableHead>Notes</TableHead>
+                                    {/* <TableHead>Status</TableHead> */}
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {loading ? (
                                     <TableRow>
-                                        <TableCell colSpan={5} className="text-center py-10">
+                                        <TableCell colSpan={3} className="text-center py-10">
                                             <RefreshCw className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
-                                            <p className="mt-2 text-sm text-muted-foreground">Loading orders...</p>
+                                            <p className="mt-2 text-sm text-muted-foreground">Loading leads...</p>
                                         </TableCell>
                                     </TableRow>
                                 ) : orders.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">
-                                            No orders found.
+                                        <TableCell colSpan={3} className="text-center py-10 text-muted-foreground">
+                                            No leads found.
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    orders.map((order) => (
-                                        <TableRow key={order.id}>
-                                            <TableCell className="font-medium">{order.id}</TableCell>
-                                            <TableCell>{order.customer_name}</TableCell>
+                                    orders.map((order, idx) => (
+                                        <TableRow key={idx}>
+                                            <TableCell className="font-medium">{order.customer_name}</TableCell>
                                             <TableCell className="text-muted-foreground">{order.phone}</TableCell>
-                                            <TableCell>{getStatusBadge(order.status)}</TableCell>
-                                            <TableCell className="text-right text-muted-foreground">
-                                                {formatDate(order.created_at)}
-                                            </TableCell>
+                                            <TableCell>{order.notes || "-"}</TableCell>
+                                            {/* <TableCell><Badge variant="outline">New</Badge></TableCell> */}
                                         </TableRow>
                                     ))
                                 )}
