@@ -13,6 +13,15 @@ class Settings(BaseSettings):
     # VAPI Settings
     VAPI_API_KEY: str = ""
     VAPI_WEBHOOK_SECRET: str = ""
+    VAPI_SECRET_TOKEN: str = "your-secret-token-here"
+    
+    # VAPI Call Routing
+    VIP_NUMBERS: List[str] = ["+1111111111"]
+    BLACKLIST_NUMBERS: List[str] = []
+    
+    # Telegram Monitoring
+    TELEGRAM_BOT_TOKEN: str = ""
+    ADMIN_CHAT_ID: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env", 
