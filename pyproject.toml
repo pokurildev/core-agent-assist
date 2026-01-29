@@ -7,7 +7,7 @@ authors = ["Antigravity <antigravity@google.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<3.15"
 fastapi = "^0.109.0"
 uvicorn = "^0.27.0"
 pydantic = "^2.6.0"
@@ -15,6 +15,15 @@ pydantic-settings = "^2.1.0"
 loguru = "^0.7.2"
 python-dotenv = "^1.0.1"
 pyyaml = "^6.0.3"
+vapi-server-sdk = "^0.1"
+vapi-python = "^0.1"
+requests = "^2.32"
+google-api-python-client = "^2.188.0"
+google-auth = "^2.48.0"
+google-auth-oauthlib = "^1.2.4"
+google-auth-httplib2 = "^0.2.0"
+httpx = "^0.28.1"
+aiogram = "^3.7.0"
 
 [build-system]
 requires = ["poetry-core"]

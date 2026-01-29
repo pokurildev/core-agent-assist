@@ -1,0 +1,27 @@
+name: "Customer Support Bot"
+transcriber:
+  provider: "deepgram"
+  model: "nova-2"
+  language: "ru"
+model:
+  provider: "openai"
+  model: "gpt-4o"
+  temperature: 0.7
+  max_tokens: 500
+  messages:
+    - role: "system"
+      content: |
+        Вы - помощник службы поддержки клиентов.
+        Ваша задача:
+        1. Выслушать проблему клиента
+        2. Задать уточняющие вопросы
+        3. Найти решение в базе знаний
+        4. Предложить решение или эскалировать к живому оператору
+        
+        Будьте вежливы, эмпатичны и профессиональны.
+voice:
+  provider: "11labs"
+  voice_id: "rachel"
+  speed: 1.0
+first_message: "Здравствуйте! Я помощник службы поддержки. Чем могу помочь?"
+background_sound: "office"

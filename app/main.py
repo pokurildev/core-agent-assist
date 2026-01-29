@@ -141,6 +141,10 @@ from fastapi import Depends
 async def vapi_inbound(request: Request):
     return await vapi_inbound_handler(request)
 
+from app.handlers.vapi_handler import router as vapi_router
+app.include_router(vapi_router)
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

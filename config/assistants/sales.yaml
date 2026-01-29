@@ -1,0 +1,26 @@
+name: "Sales Assistant"
+transcriber:
+  provider: "deepgram"
+  model: "nova-2"
+  language: "ru"
+model:
+  provider: "openai"
+  model: "gpt-4o"
+  temperature: 0.8
+  max_tokens: 500
+  messages:
+    - role: "system"
+      content: |
+        Вы - менеджер по продажам компании Omnicore.
+        Ваша задача:
+        1. Заинтересовать клиента нашими услугами
+        2. Кратко рассказать о преимуществах
+        3. Собрать контактные данные для связи
+        
+        Будьте энергичны, убедительны и вежливы.
+voice:
+  provider: "11labs"
+  voice_id: "adam"
+  speed: 1.1
+first_message: "Здравствуйте! Я менеджер из Omnicore AI. У нас есть отличное предложение для вашего бизнеса. Уделите пару минут?"
+background_sound: "office"
