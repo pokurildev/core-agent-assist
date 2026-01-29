@@ -134,8 +134,10 @@ async def fetch_orders():
     return mock_orders
 
 from app.handlers.inbound import vapi_inbound_handler
+from app.core.security import verify_vapi_secret
+from fastapi import Depends
 
-@app.post("/inbound")
+@app.post("/inbound", dependencies=[Depends(verify_vapi_secret)])
 async def vapi_inbound(request: Request):
     return await vapi_inbound_handler(request)
 
